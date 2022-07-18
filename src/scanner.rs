@@ -1,14 +1,14 @@
+use crate::loxide::Loxide;
+use crate::token::TokenType::{
+    And, Bang, BangEqual, Class, Comma, Dot, Else, Eof, Equal, EqualEqual, False, For, Fun,
+    Greater, GreaterEqual, Identifier, If, LeftBrace, LeftParen, Less, LessEqual, Minus, Nil,
+    Number, Or, Plus, Print, Return, RightBrace, RightParen, Semicolon, Slash, Star, String_,
+    Super, This, True, Var, While,
+};
+use crate::token::{Literal, Token, TokenType};
 use phf::phf_map;
 use std::collections::HashMap;
 use std::str::FromStr;
-use crate::loxide::Loxide;
-use crate::token::{Literal, Token, TokenType};
-use crate::token::TokenType::{
-    And, Bang, BangEqual, Class, Comma, Dot, Else, EOF, Equal, EqualEqual, False, For, Fun, Greater,
-    GreaterEqual, Identifier, If, LeftBrace, LeftParen, Less, LessEqual, Minus, Nil, Number, Or,
-    Plus, Print, Return, RightBrace, RightParen, Semicolon, Slash, Star, String_, Super, This, True,
-    Var, While,
-};
 
 static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
     "and" => And,
@@ -34,7 +34,7 @@ pub struct Scanner {
     tokens: Vec<Token>,
     start: usize,
     current: usize,
-    line: usize
+    line: usize,
 }
 
 impl Scanner {
@@ -54,7 +54,7 @@ impl Scanner {
             self.scan_token();
         }
 
-        self.tokens.push(Token::new(EOF, "", None, self.line));
+        self.tokens.push(Token::new(Eof, "", None, self.line));
         self.tokens.clone()
     }
 
@@ -63,8 +63,6 @@ impl Scanner {
     }
 
     fn scan_token(&mut self) {
-
-
         let character = self.advance();
         match character {
             '(' => self.add_token(LeftParen),
@@ -82,14 +80,12 @@ impl Scanner {
             '<' => self.handle_multi_char_operators('=', LessEqual, Less),
             '>' => self.handle_multi_char_operators('=', GreaterEqual, Greater),
             '/' => self.slash(),
-            ' ' | '\r' | '\t' => {},
+            ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             '"' => self.string(),
             '0'..='9' => self.number(),
-            'a'..='z' |'A'..='Z' | '_' => self.identifier(),
-            _ => {
-                Loxide::error(self.line, "Unexpected character.")
-            }
+            'a'..='z' | 'A'..='Z' | '_' => self.identifier(),
+            _ => Loxide::error(self.line, "Unexpected character."),
         }
     }
 
@@ -98,7 +94,12 @@ impl Scanner {
         self.source.chars().nth(self.current - 1).unwrap() //TODO: revisit get char iterator once, fix unwrap
     }
 
-    fn handle_multi_char_operators(&mut self, second_character: char, true_: TokenType, false_: TokenType) {
+    fn handle_multi_char_operators(
+        &mut self,
+        second_character: char,
+        true_: TokenType,
+        false_: TokenType,
+    ) {
         let type_ = self.token_match(second_character, true_, false_);
         self.add_token(type_);
     }
@@ -133,7 +134,7 @@ impl Scanner {
 
     fn peek(&self) -> char {
         if self.is_at_end() {
-            return '\0'
+            return '\0';
         }
 
         self.get_char(self.current)
@@ -173,42 +174,42 @@ impl Scanner {
         self.advance();
         self.add_token_literal(
             String_,
-            Some(Literal::String_(self.get_substring(self.start + 1, self.current - 1)))
+            Some(Literal::String_(
+                self.get_substring(self.start + 1, self.current - 1),
+            )),
         );
     }
 
     fn number(&mut self) {
-        while self.peek().is_digit(10) {
+        while self.peek().is_ascii_digit() {
             self.advance();
         }
 
-        if self.peek() == '.' && self.peek_next().is_digit(10) {
+        if self.peek() == '.' && self.peek_next().is_ascii_digit() {
             self.advance();
 
-            while self.peek().is_digit(10) {
+            while self.peek().is_ascii_digit() {
                 self.advance();
             }
         }
 
         self.add_token_literal(
             Number,
-            Some(
-                Literal::Number(
-                    f64::from_str(&self.source[(self.start + 1)..(self.current - 1)]).unwrap()
-                )
-            )
+            Some(Literal::Number(
+                f64::from_str(&self.source[(self.start + 1)..(self.current - 1)]).unwrap(),
+            )),
         )
     }
 
     fn identifier(&mut self) {
         while self.is_alphanumeric(self.peek()) {
             self.advance();
-        };
+        }
 
         self.add_token(
-            KEYWORDS.get(
-                &self.get_substring(self.start, self.current)
-            ).map_or_else(|| Identifier, Clone::clone)
+            KEYWORDS
+                .get(&self.get_substring(self.start, self.current))
+                .map_or_else(|| Identifier, Clone::clone),
         );
     }
 
@@ -217,7 +218,7 @@ impl Scanner {
     }
 
     fn add_token(&mut self, type_: TokenType) {
-       self.add_token_literal(type_, None);
+        self.add_token_literal(type_, None);
     }
 
     fn add_token_literal(&mut self, type_: TokenType, literal: Option<Literal>) {
@@ -225,7 +226,7 @@ impl Scanner {
             type_,
             &self.source[self.start..self.current],
             literal,
-            self.line
+            self.line,
         ));
     }
 }

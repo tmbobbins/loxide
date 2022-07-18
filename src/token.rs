@@ -48,7 +48,7 @@ pub enum TokenType {
     Var,
     While,
 
-    EOF
+    Eof,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -56,7 +56,7 @@ pub enum Literal {
     String_(String),
     Number(f64),
     Bool(bool),
-    Nil
+    Nil,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -73,7 +73,7 @@ impl Token {
             type_,
             lexeme: lexeme.to_owned(),
             literal,
-            line
+            line,
         }
     }
 }

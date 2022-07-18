@@ -1,5 +1,5 @@
-use std::env;
 use loxide::loxide::Loxide;
+use std::env;
 
 fn main() {
     let loxide = Loxide::new();

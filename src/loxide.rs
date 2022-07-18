@@ -1,10 +1,10 @@
+use crate::scanner::Scanner;
+use crate::token::Token;
+use anyhow::Result;
 use std::fs::read;
 use std::io;
 use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
-use anyhow::Result;
-use crate::scanner::Scanner;
-use crate::token::Token;
 
 static HAD_ERROR: AtomicBool = AtomicBool::new(false);
 
@@ -14,7 +14,7 @@ pub struct Loxide {
 
 impl Loxide {
     pub fn new() -> Self {
-        Self{ had_error: false }
+        Self { had_error: false }
     }
 
     pub fn run_file(&self, path: &str) -> Result<()> {
@@ -38,7 +38,7 @@ impl Loxide {
 
     pub fn run(&self, source: &str) {
         let mut scanner = Scanner::new(source.to_owned());
-        let tokens : Vec<Token> = scanner.scan_tokens();
+        let tokens: Vec<Token> = scanner.scan_tokens();
 
         for token in tokens {
             println!("{}", token);
@@ -56,5 +56,11 @@ impl Loxide {
 
     pub fn set_had_error(errored: bool) {
         HAD_ERROR.store(errored, Ordering::Relaxed)
+    }
+}
+
+impl Default for Loxide {
+    fn default() -> Self {
+        Self::new()
     }
 }

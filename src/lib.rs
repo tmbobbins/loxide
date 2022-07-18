@@ -1,3 +1,3 @@
 pub mod loxide;
-mod token;
 mod scanner;
+mod token;
