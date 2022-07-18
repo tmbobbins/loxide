@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.58"
-phf = { version = "0.10.1", features = ["macros"] }
+phf = { version = "0.11.0", features = ["macros"] }

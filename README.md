@@ -5,7 +5,7 @@ following the [Crafting interpreters book](https://craftinginterpreters.com/).
 ## Usage
 `cargo run` / `cargo build --release && ./target/debug/loxide`
 
-## Deps
+## Dependencies
 ### anyhow
 [![dependency status](https://deps.rs/crate/anyhow/1.0.58/status.svg)](https://deps.rs/crate/anyhow/1.0.58)
 
